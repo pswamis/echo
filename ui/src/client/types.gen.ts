@@ -1123,11 +1123,11 @@ export type CurrentUsageResponse = {
      */
     period_end: string;
     /**
-     * Used Dograh Tokens
+     * Used Echo Tokens
      */
     used_dograh_tokens: number;
     /**
-     * Quota Dograh Tokens
+     * Quota Echo Tokens
      */
     quota_dograh_tokens: number;
     /**
@@ -1217,7 +1217,7 @@ export type DailyUsageBreakdownResponse = {
      */
     total_cost_usd?: number | null;
     /**
-     * Total Dograh Tokens
+     * Total Echo Tokens
      */
     total_dograh_tokens: number;
     /**
@@ -1243,7 +1243,7 @@ export type DailyUsageItem = {
      */
     cost_usd?: number | null;
     /**
-     * Dograh Tokens
+     * Echo Tokens
      */
     dograh_tokens: number;
     /**
@@ -1855,7 +1855,7 @@ export type HttpApiConfig = {
     /**
      * Preset Parameters
      *
-     * Parameters injected by Dograh from fixed values or workflow context templates
+     * Parameters injected by Echo from fixed values or workflow context templates
      */
     preset_parameters?: Array<PresetToolParameter> | null;
     /**
@@ -2513,7 +2513,7 @@ export type PlivoConfigurationResponse = {
 /**
  * PresetToolParameter
  *
- * A parameter injected by Dograh at runtime.
+ * A parameter injected by Echo at runtime.
  */
 export type PresetToolParameter = {
     /**
@@ -4004,7 +4004,7 @@ export type UsageHistoryResponse = {
      */
     runs: Array<WorkflowRunUsageResponse>;
     /**
-     * Total Dograh Tokens
+     * Total Echo Tokens
      */
     total_dograh_tokens: number;
     /**
@@ -4694,7 +4694,7 @@ export type WorkflowRunUsageResponse = {
      */
     created_at: string;
     /**
-     * Dograh Token Usage
+     * Echo Token Usage
      */
     dograh_token_usage: number;
     /**

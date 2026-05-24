@@ -150,14 +150,14 @@ export function WorkflowRunsTable({
                         </div>
                     </CardHeader>
                     <CardContent>
-                        <div className="bg-card border border-border rounded-lg overflow-hidden shadow-sm">
+                        <div className="bg-card border border-border rounded-lg overflow-x-auto shadow-sm">
                             <Table>
                                 <TableHeader>
                                     <TableRow className="bg-muted/50">
                                         <TableHead className="font-semibold">ID</TableHead>
                                         <TableHead className="font-semibold">Status</TableHead>
                                         <TableHead className="font-semibold">Created At</TableHead>
-                                        <TableHead className="font-semibold">Call Type</TableHead>
+                                        <TableHead className="font-semibold hidden sm:table-cell">Call Type</TableHead>
                                         <TableHead
                                             className="font-semibold cursor-pointer hover:bg-muted/50 select-none"
                                             onClick={() => onSort?.('duration')}
@@ -171,7 +171,7 @@ export function WorkflowRunsTable({
                                                 )}
                                             </div>
                                         </TableHead>
-                                        <TableHead className="font-semibold">Disposition</TableHead>
+                                        <TableHead className="font-semibold hidden md:table-cell">Disposition</TableHead>
                                         <TableHead className="font-semibold">Actions</TableHead>
                                     </TableRow>
                                 </TableHeader>
@@ -189,7 +189,7 @@ export function WorkflowRunsTable({
                                                 </Badge>
                                             </TableCell>
                                             <TableCell className="text-sm">{formatDate(run.created_at)}</TableCell>
-                                            <TableCell>
+                                            <TableCell className="hidden sm:table-cell">
                                                 <CallTypeCell mode={run.mode} callType={run.call_type} />
                                             </TableCell>
                                             <TableCell className="text-sm">
@@ -197,7 +197,7 @@ export function WorkflowRunsTable({
                                                     ? `${run.cost_info.call_duration_seconds.toFixed(1)}s`
                                                     : "-"}
                                             </TableCell>
-                                            <TableCell>
+                                            <TableCell className="hidden md:table-cell">
                                                 {run.gathered_context?.mapped_call_disposition ? (
                                                     <Badge variant="default">
                                                         {run.gathered_context.mapped_call_disposition as string}

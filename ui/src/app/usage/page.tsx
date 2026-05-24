@@ -466,18 +466,18 @@ export default function UsagePage() {
                             </div>
                         ) : usageHistory && usageHistory.runs.length > 0 ? (
                             <>
-                                <div className="bg-card border rounded-lg overflow-hidden shadow-sm">
+                                <div className="bg-card border rounded-lg overflow-x-auto shadow-sm">
                                     <Table>
                                         <TableHeader>
                                             <TableRow className="bg-muted/50">
                                                 <TableHead className="font-semibold">Run ID</TableHead>
                                                 <TableHead className="font-semibold">Agent Name</TableHead>
-                                                <TableHead className="font-semibold">Call Type</TableHead>
-                                                <TableHead className="font-semibold">Phone Number</TableHead>
-                                                <TableHead className="font-semibold">Disposition</TableHead>
+                                                <TableHead className="font-semibold hidden sm:table-cell">Call Type</TableHead>
+                                                <TableHead className="font-semibold hidden md:table-cell">Phone Number</TableHead>
+                                                <TableHead className="font-semibold hidden sm:table-cell">Disposition</TableHead>
                                                 <TableHead className="font-semibold">Date</TableHead>
                                                 <TableHead className="font-semibold text-right">Duration</TableHead>
-                                                <TableHead className="font-semibold text-right">
+                                                <TableHead className="font-semibold text-right hidden md:table-cell">
                                                     {organizationPricing?.price_per_second_usd ? 'Cost (USD)' : 'Tokens'}
                                                 </TableHead>
                                                 <TableHead className="font-semibold">Actions</TableHead>
@@ -495,15 +495,15 @@ export default function UsagePage() {
                                                         #{run.id}
                                                     </TableCell>
                                                     <TableCell>{run.workflow_name || 'Unknown'}</TableCell>
-                                                    <TableCell>
+                                                    <TableCell className="hidden sm:table-cell">
                                                         <CallTypeCell mode={run.mode} callType={run.call_type} />
                                                     </TableCell>
-                                                    <TableCell className="text-sm">
+                                                    <TableCell className="text-sm hidden md:table-cell">
                                                         {(run.call_type === 'inbound'
                                                             ? run.caller_number
                                                             : run.called_number) || '-'}
                                                     </TableCell>
-                                                    <TableCell>
+                                                    <TableCell className="hidden sm:table-cell">
                                                         {run.disposition ? (
                                                             <Badge variant="default">
                                                                 {run.disposition}
@@ -516,7 +516,7 @@ export default function UsagePage() {
                                                     <TableCell className="text-right">
                                                         {formatDuration(run.call_duration_seconds)}
                                                     </TableCell>
-                                                    <TableCell className="text-right font-medium">
+                                                    <TableCell className="text-right font-medium hidden md:table-cell">
                                                         {organizationPricing?.price_per_second_usd && run.charge_usd !== undefined && run.charge_usd !== null
                                                             ? `$${run.charge_usd.toFixed(2)}`
                                                             : run.dograh_token_usage.toLocaleString()

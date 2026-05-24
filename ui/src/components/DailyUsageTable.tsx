@@ -65,13 +65,13 @@ export function DailyUsageTable({ data, isLoading }: DailyUsageTableProps) {
                 <CardDescription>Last 7 days of usage</CardDescription>
             </CardHeader>
             <CardContent>
-                <div className="bg-white border rounded-lg overflow-hidden shadow-sm">
+                <div className="bg-white border rounded-lg overflow-x-auto shadow-sm">
                     <Table>
                         <TableHeader>
                             <TableRow className="bg-gray-50">
                                 <TableHead className="font-semibold">Date</TableHead>
-                                <TableHead className="font-semibold text-right">Usage (minutes)</TableHead>
-                                <TableHead className="font-semibold text-right">Cost (USD)</TableHead>
+                                <TableHead className="font-semibold text-right whitespace-nowrap">Usage (min)</TableHead>
+                                <TableHead className="font-semibold text-right hidden sm:table-cell">Cost (USD)</TableHead>
                                 <TableHead className="font-semibold text-right">Calls</TableHead>
                             </TableRow>
                         </TableHeader>
@@ -84,7 +84,7 @@ export function DailyUsageTable({ data, isLoading }: DailyUsageTableProps) {
                                     <TableCell className="text-right">
                                         {day.minutes.toFixed(1)}
                                     </TableCell>
-                                    <TableCell className="text-right font-medium">
+                                    <TableCell className="text-right font-medium hidden sm:table-cell">
                                         ${(day.cost_usd || 0).toFixed(2)}
                                     </TableCell>
                                     <TableCell className="text-right">
@@ -99,7 +99,7 @@ export function DailyUsageTable({ data, isLoading }: DailyUsageTableProps) {
                                 <TableCell className="text-right">
                                     {data.total_minutes.toFixed(1)}
                                 </TableCell>
-                                <TableCell className="text-right">
+                                <TableCell className="text-right hidden sm:table-cell">
                                     ${(data.total_cost_usd || 0).toFixed(2)}
                                 </TableCell>
                                 <TableCell className="text-right">

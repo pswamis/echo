@@ -7,6 +7,15 @@ const nextConfig: NextConfig = {
   experimental: {
     serverSourceMaps: true,
   },
+  // Disable webpack persistent file cache — its PackFileCacheStrategy.serialize
+  // step is the OOM trigger when cross-compiling amd64 under QEMU on Apple
+  // Silicon (the Node process balloons during cache writes). Our build flow
+  // is infrequent and the cache wouldn't survive across docker layer builds
+  // anyway, so the speedup is purely incremental and we lose nothing real.
+  webpack: (config) => {
+    config.cache = false;
+    return config;
+  },
   async rewrites() {
     return [
       // API proxy for backend calls (excluding Next.js API routes)

@@ -326,16 +326,16 @@ export default function UsagePage() {
     };
 
     return (
-        <div className="container mx-auto p-6 space-y-6">
+        <div className="container mx-auto p-4 sm:p-6 space-y-6">
             <div>
-                <div className="flex justify-between items-start">
-                    <div>
-                        <h1 className="text-3xl font-bold mb-2">Agent Runs</h1>
+                <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-start">
+                    <div className="min-w-0">
+                        <h1 className="text-2xl sm:text-3xl font-bold mb-2">Agent Runs</h1>
                         <p className="text-muted-foreground">See all your Agent Runs across all Voice Agents. You can use filters to filter out required Agent Runs.</p>
                     </div>
-                        <div className="flex items-center gap-2">
-                            <Globe className="h-4 w-4 text-muted-foreground" />
-                            <div className="w-[300px]">
+                        <div className="flex items-center gap-2 w-full sm:w-auto">
+                            <Globe className="h-4 w-4 text-muted-foreground shrink-0" />
+                            <div className="flex-1 sm:w-[300px]">
                                 <TimezoneSelect
                                     instanceId={timezoneSelectId}
                                     value={selectedTimezone}
@@ -494,7 +494,7 @@ export default function UsagePage() {
                                                     >
                                                         #{run.id}
                                                     </TableCell>
-                                                    <TableCell>{run.workflow_name || 'Unknown'}</TableCell>
+                                                    <TableCell className="max-w-[140px] sm:max-w-none truncate" title={run.workflow_name || 'Unknown'}>{run.workflow_name || 'Unknown'}</TableCell>
                                                     <TableCell className="hidden sm:table-cell">
                                                         <CallTypeCell mode={run.mode} callType={run.call_type} />
                                                     </TableCell>

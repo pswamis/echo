@@ -107,12 +107,12 @@ async function PageContent() {
     const workflowList = await WorkflowList();
 
     return (
-        <div className="container mx-auto px-4 py-8">
+        <div className="container mx-auto px-4 py-6 sm:py-8">
             {/* Your Workflows Section */}
             <div className="mb-6">
-                <div className="flex justify-between items-center mb-6">
+                <div className="flex flex-col gap-3 mb-6 sm:flex-row sm:justify-between sm:items-center">
                     <h1 className="text-2xl font-bold">Your Agents</h1>
-                    <div className="flex gap-2">
+                    <div className="flex flex-wrap gap-2">
                         <UploadWorkflowButton />
                         <CreateFolderButton />
                         <CreateWorkflowButton />

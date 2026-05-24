@@ -126,13 +126,13 @@ export function WorkflowTable({
     };
 
     return (
-        <div className="bg-card border rounded-lg overflow-hidden shadow-sm">
+        <div className="bg-card border rounded-lg overflow-x-auto shadow-sm">
             <Table>
                 <TableHeader>
                     <TableRow>
-                        <TableHead className="font-semibold">ID</TableHead>
+                        <TableHead className="font-semibold hidden md:table-cell">ID</TableHead>
                         <TableHead className="font-semibold">Agent Name</TableHead>
-                        <TableHead className="font-semibold">Created At</TableHead>
+                        <TableHead className="font-semibold hidden sm:table-cell">Created At</TableHead>
                         <TableHead className="font-semibold text-center">Total Runs</TableHead>
                         <TableHead className="font-semibold text-right">Actions</TableHead>
                     </TableRow>
@@ -143,13 +143,13 @@ export function WorkflowTable({
                             key={workflow.id}
                             className={`hover:bg-accent transition-colors ${showArchived ? 'opacity-60' : ''}`}
                         >
-                            <TableCell className="text-muted-foreground">
+                            <TableCell className="text-muted-foreground hidden md:table-cell">
                                 {workflow.id}
                             </TableCell>
-                            <TableCell className="font-medium">
+                            <TableCell className="font-medium max-w-[180px] sm:max-w-none truncate" title={workflow.name}>
                                 {workflow.name}
                             </TableCell>
-                            <TableCell>
+                            <TableCell className="hidden sm:table-cell">
                                 {new Date(workflow.created_at).toLocaleDateString('en-US', {
                                     year: 'numeric',
                                     month: 'short',

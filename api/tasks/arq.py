@@ -12,7 +12,7 @@ from api.tasks.function_names import FunctionNames
 setup_logging()
 
 # Now import ARQ and task dependencies
-from arq import create_pool
+from arq import create_pool, cron
 from arq.connections import ArqRedis, RedisSettings
 
 parsed_url = urlparse(REDIS_URL)
@@ -43,6 +43,7 @@ from api.tasks.campaign_tasks import (
     process_campaign_batch,
     sync_campaign_source,
 )
+from api.tasks.demo_pruner import prune_demo_workflows
 from api.tasks.knowledge_base_processing import process_knowledge_base_document
 from api.tasks.run_integrations import run_integrations_post_workflow_run
 from api.tasks.s3_upload import (
@@ -59,8 +60,11 @@ class WorkerSettings:
         sync_campaign_source,
         process_campaign_batch,
         process_knowledge_base_document,
+        prune_demo_workflows,
     ]
-    cron_jobs = []
+    cron_jobs = [
+        cron(prune_demo_workflows, hour={0, 6, 12, 18}, minute=30),
+    ]
     redis_settings = REDIS_SETTINGS
     max_jobs = 10
 

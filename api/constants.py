@@ -145,6 +145,6 @@ OSS_JWT_EXPIRY_HOURS = int(os.getenv("OSS_JWT_EXPIRY_HOURS", "720"))  # 30 days
 
 TUNER_BASE_URL = os.getenv("TUNER_BASE_URL", "https://api.usetuner.ai")
 
-DEMO_SECRET = os.getenv("DEMO_SECRET", "")
+DEMO_SECRET: str | None = os.getenv("DEMO_SECRET")
 DEMO_ORG_ID = int(os.getenv("DEMO_ORG_ID", "0"))
 DEMO_USER_ID = int(os.getenv("DEMO_USER_ID", "0"))

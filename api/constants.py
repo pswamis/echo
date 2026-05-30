@@ -148,3 +148,8 @@ TUNER_BASE_URL = os.getenv("TUNER_BASE_URL", "https://api.usetuner.ai")
 DEMO_SECRET: str | None = os.getenv("DEMO_SECRET")
 DEMO_ORG_ID = int(os.getenv("DEMO_ORG_ID", "0"))
 DEMO_USER_ID = int(os.getenv("DEMO_USER_ID", "0"))
+# Public base URL the browser uses for the demo WebSocket (e.g.
+# "wss://api.voiceflowx.com"). Lets the demo advertise its own domain without
+# disturbing BACKEND_API_ENDPOINT, which the rest of the platform depends on.
+# Falls back to BACKEND_API_ENDPOINT (scheme-swapped) when unset.
+DEMO_WS_PUBLIC_URL: str | None = os.getenv("DEMO_WS_PUBLIC_URL")

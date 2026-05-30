@@ -16,6 +16,7 @@ from api.constants import (
     DEMO_ORG_ID,
     DEMO_SECRET,
     DEMO_USER_ID,
+    DEMO_WS_PUBLIC_URL,
     REDIS_URL,
 )
 from api.db import db_client
@@ -145,8 +146,10 @@ async def create_demo_session(
     except Exception:
         pass
 
-    ws_base = BACKEND_API_ENDPOINT.replace("https://", "wss://").replace("http://", "ws://")
-    ws_url = f"{ws_base}/api/v1/ws/demo/{body.session_token}"
+    ws_base = (DEMO_WS_PUBLIC_URL or BACKEND_API_ENDPOINT).replace(
+        "https://", "wss://"
+    ).replace("http://", "ws://")
+    ws_url = f"{ws_base.rstrip('/')}/api/v1/ws/demo/{body.session_token}"
     return CreateDemoResponse(
         ws_url=ws_url,
         workflow_run_id=run.id,

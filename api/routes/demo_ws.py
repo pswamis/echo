@@ -2,30 +2,21 @@
 
 Token-protected: a valid token must have been issued by voiceflow-demo-api
 via POST /internal/demo/create and stored in Redis. Single-use (slot_claimed
-prevents replay). Runs the same SmallWebRTC pipeline as production calls.
-"""
-import asyncio
+prevents replay).
 
+Connection handling is delegated to the production ``signaling_manager`` — the
+exact same SignalingManager used by authenticated and embed calls — so demo
+sessions inherit its full WebRTC lifecycle (offer / ICE trickling /
+renegotiation / peer-connection cleanup) rather than a hand-rolled subset. The
+only demo-specific concerns kept here are token validation and slot accounting.
+"""
 import redis.asyncio as aioredis
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 from loguru import logger
 
 from api.constants import DEMO_USER_ID, REDIS_URL
 from api.db import db_client
-from api.routes.webrtc_signaling import (
-    ICE_INBOUND_POLICY,
-    _keep_candidate,
-    filter_outbound_sdp,
-    get_ice_servers,
-)
-from api.services.pipecat.run_pipeline import run_pipeline_smallwebrtc
-from api.services.pipecat.ws_sender_registry import (
-    register_ws_sender,
-    unregister_ws_sender,
-)
-from aiortc.sdp import candidate_from_sdp
-from pipecat.transports.smallwebrtc.connection import SmallWebRTCConnection
-from starlette.websockets import WebSocketState
+from api.routes.webrtc_signaling import signaling_manager
 
 router = APIRouter(prefix="/ws", tags=["demo-ws"])
 
@@ -61,81 +52,33 @@ async def demo_websocket(websocket: WebSocket, token: str):
         await websocket.close(code=1008, reason="Invalid or expired token")
         return
 
-    # Atomically claim the slot — prevents TOCTOU race on concurrent connections
+    # Atomically claim the slot — prevents TOCTOU race on concurrent connections.
     claimed = await redis.eval(_CLAIM_SCRIPT, 2, session_key, "demo:slots:active")
     if not claimed:
         await websocket.close(code=1008, reason="Token already used")
         return
 
-    workflow_id = int(session["workflow_id"])
-    workflow_run_id = int(session["workflow_run_id"])
-
-    await websocket.accept()
-
-    demo_user = await db_client.get_user_by_id(DEMO_USER_ID)
-    if not demo_user:
-        await websocket.close(code=1011, reason="Demo not configured")
-        return
-
-    pc: SmallWebRTCConnection | None = None
-
-    async def ws_sender(message: dict):
-        if websocket.application_state == WebSocketState.CONNECTED:
-            await websocket.send_json(message)
-
-    register_ws_sender(workflow_run_id, ws_sender)
-
+    # Slot is now claimed (counter incremented). Guarantee it is always freed.
     try:
-        while True:
-            message = await websocket.receive_json()
-            msg_type = message.get("type")
-            payload = message.get("payload", {})
+        workflow_id = int(session["workflow_id"])
+        workflow_run_id = int(session["workflow_run_id"])
 
-            if msg_type == "offer":
-                pc_id = payload.get("pc_id")
-                sdp = payload.get("sdp")
-                type_ = payload.get("type")
+        demo_user = await db_client.get_user_by_id(DEMO_USER_ID)
+        if not demo_user:
+            await websocket.close(code=1011, reason="Demo not configured")
+            return
 
-                ice_servers = get_ice_servers(user_id="demo")
-                pc = SmallWebRTCConnection(ice_servers=ice_servers, connection_timeout_secs=60)
-                pc._pc_id = pc_id
-                await pc.initialize(sdp=sdp, type=type_)
-
-                asyncio.create_task(
-                    run_pipeline_smallwebrtc(pc, workflow_id, workflow_run_id, DEMO_USER_ID)
-                )
-
-                answer = pc.get_answer()
-                await websocket.send_json({
-                    "type": "answer",
-                    "payload": {
-                        "sdp": filter_outbound_sdp(answer["sdp"]),
-                        "type": answer["type"],
-                        "pc_id": answer["pc_id"],
-                    },
-                })
-
-            elif msg_type == "ice-candidate" and pc:
-                candidate_data = payload.get("candidate")
-                if candidate_data:
-                    candidate_str = candidate_data.get("candidate", "")
-                    if _keep_candidate(candidate_str, ICE_INBOUND_POLICY):
-                        try:
-                            candidate = candidate_from_sdp(candidate_str)
-                            candidate.sdpMid = candidate_data.get("sdpMid")
-                            candidate.sdpMLineIndex = candidate_data.get("sdpMLineIndex")
-                            await pc.add_ice_candidate(candidate)
-                        except Exception as e:
-                            logger.error(f"Demo ICE candidate error: {e}")
-
+        # Delegate to the production signaling manager — identical WebRTC
+        # connection handling to authenticated/embed calls (it calls
+        # websocket.accept() and owns the offer/ICE/renegotiation loop).
+        await signaling_manager.handle_websocket(
+            websocket, workflow_id, workflow_run_id, demo_user
+        )
     except WebSocketDisconnect:
         logger.info(f"Demo WebSocket disconnected for token {token[:8]}...")
     except Exception as e:
         logger.error(f"Demo WebSocket error: {e}")
     finally:
-        unregister_ws_sender(workflow_run_id)
-        if pc:
-            await pc.disconnect()
         deleted = await redis.delete(session_key)
         if deleted:
             await redis.decr("demo:slots:active")
